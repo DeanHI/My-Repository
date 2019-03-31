@@ -1,0 +1,267 @@
+import time
+import os
+
+def print_hangman(num_of_tries):
+    """This is a dictionary for printing out hangman pictures according to user progression and failed guesses
+    :param: num_of tries: this parameter reflects how many attemps the user has already failed
+    :type num_of_tries: int
+    :return: HANGMAN_PHOTOS - as user declines in number of tries, prints out progressively complete hanged man
+    :rtype: dict value"""
+    
+    HANGMAN_PHOTOS ={"picture_1":"""
+\t\t\t\t\t    x-------x        No luck.
+""",
+"picture_2":"""
+\t\t\t\t\t    x-------x
+\t\t\t\t\t    |
+\t\t\t\t\t    |
+\t\t\t\t\t    |
+\t\t\t\t\t    |
+\t\t\t\t\t    |                Are you doing this on purpose?
+""",
+"picture_3":"""
+\t\t\t\t\t    x-------x
+\t\t\t\t\t    |       |
+\t\t\t\t\t    |       0
+\t\t\t\t\t    |
+\t\t\t\t\t    |
+\t\t\t\t\t    |                Better think about vowels!
+""",
+"picture_4":"""
+\t\t\t\t\t    x-------x
+\t\t\t\t\t    |       |
+\t\t\t\t\t    |       0
+\t\t\t\t\t    |       |
+\t\t\t\t\t    |
+\t\t\t\t\t    |                Inching closer...
+""",
+"picture_5":"""
+\t\t\t\t\t    x-------x
+\t\t\t\t\t    |       |
+\t\t\t\t\t    |       0
+\t\t\t\t\t    |      /|\\
+\t\t\t\t\t    |
+\t\t\t\t\t    |                Choose your next one wisely.
+""",
+"picture_6":"""
+\t\t\t\t\t    x-------x
+\t\t\t\t\t    |       |
+\t\t\t\t\t    |       0
+\t\t\t\t\t    |      /|\\
+\t\t\t\t\t    |      /
+\t\t\t\t\t    |                Careful now!
+""",
+"picture_7":"""
+\t\t\t\t\t    x-------x
+\t\t\t\t\t    |       |
+\t\t\t\t\t    |       0
+\t\t\t\t\t    |      /|\\
+\t\t\t\t\t    |      / \\
+\t\t\t\t\t    |
+
+ """} 
+    if num_of_tries == 1:
+        print(HANGMAN_PHOTOS["picture_1"])
+    elif num_of_tries == 2:
+        print(HANGMAN_PHOTOS["picture_2"])
+    elif num_of_tries == 3:
+        print(HANGMAN_PHOTOS["picture_3"])
+    elif num_of_tries == 4:
+        print(HANGMAN_PHOTOS["picture_4"])
+    elif num_of_tries == 5:
+        print(HANGMAN_PHOTOS["picture_5"])
+    elif num_of_tries == 6:
+        print(HANGMAN_PHOTOS["picture_6"])
+    elif num_of_tries == 7:
+        print(HANGMAN_PHOTOS["picture_7"])
+
+
+def check_win(secret_word, old_letters_guessed):
+    """This function checks if win conditions are met, returns True if met
+    :param secret_word: word chosen by player at choose_word func
+    :param old_letters_guessed: appended letter for keeping track of guesses
+    :type secret_word: str
+    :type old_letters_guessed: list
+    :return: True if all victory conditions are met
+    :rtype: boolean"""
+
+
+    counter = 0    
+    letter_secret_word_distinct = []
+
+    for letter in secret_word:
+        if letter not in letter_secret_word_distinct:
+            letter_secret_word_distinct.append(letter)
+    #making a new list of distinct letters in secret word
+    for letter in letter_secret_word_distinct:    
+        for guess in old_letters_guessed:             
+            if letter == guess:  
+                counter += 1                          
+    #if there's a match between letter in distinct secret word and letter in guessed letters list, increment counter by 1
+    if counter == len(letter_secret_word_distinct):   
+        return True                  
+    #if counter equals to the length of distinct letters in secret word, then there are no no more unknown letters - return True
+                  
+    #I was thinking "no more ' _ 's in modified_word" is a more elegant way of doing this check, but these are func arguments that were asked for 
+def try_update_letter_guessed(letter_guessed, old_letters_guessed):
+    """This func follows validity check if passed, appends to old_letters_guessed list
+    :param letter_guessed: input from player
+    :param old_letters_guessed: appends letter for keeping track of guesses
+    :type letter_guessed: str input
+    :type old_letters_guessed: list
+    :return: if correct, replace in modified work where _s are, if not, increments mistakes counter
+    :rtype: counter increment, list append"""
+    global num_of_tries
+    if letter_guessed.lower() in secret_word:
+        old_letters_guessed.append(letter_guessed.lower())
+    #if correct guess, appends to old_letters_guessed_list, will show letter in modified_word through show_hidden_word func
+    else:
+        old_letters_guessed.append(letter_guessed.lower()) 
+        num_of_tries += 1
+        print("\n\n\n\t\t\t\t\t:(")
+    #if not, increment mistake counter and also append to old_letters_guessed
+def check_valid_input(letter_guessed, old_letters_guessed):
+    """Checks validity of player input
+    :param letter_guessed: player input
+    :param old_letters_guessed: list to check for guessed letters
+    :type: letter_guessed str input
+    :type old_letters_guessed: list
+    :return: true if all conditions met, false if otherwise
+    :rtype: boolean"""
+    if len(letter_guessed) == 1 and letter_guessed.isalpha() and (letter_guessed.lower() not in old_letters_guessed):
+    #checks for 3 AND conditions: input is 1 character long, input is an english alphabet letter, input is not already the old_letters_guessed list                                                                                                
+        return True
+    else:
+        return False
+def show_hidden_word(secret_word, old_letters_guessed):
+    """This function is used to print out the secret letters not yet guessed marked with a '_' 
+    :param old_guessed_letters: appends letters already guessed by user, first empty
+    :type secret_word: str
+    :type old_guessed_letters: list
+    :return modified_word: secret word, replaced with '_' times length of word, else appenede by correct user guesses
+    :rtype modified_word: list, in func return joined as str"""    
+    modified_word = []
+    
+    for letter in secret_word:
+        if letter in old_letters_guessed:  
+            modified_word.append(letter)
+        else: 
+            modified_word.append(' _ ')
+            
+      
+    return('\n\n\t\t\t\t\tYour secret word is    ' + ' '.join(modified_word) + '  !')
+    #I wasn't sure you wanted secret word to be presented as func return, but for the sake of continuosly changing the present word with _'s, 
+    #I needed another param      
+def choose_word(file_path, index):
+    """This function spits out a word for the user to guess, according to a user-chosen number
+    :param file_path: asks user to define the user path
+    :param index: asks user to choose a number
+    :type file_path: str input
+    :type index: str input, then cast as int
+    :return secret_word: (number of distinct letters in file path, chosen word for rest of the game) -> then cast only as chosen word
+    :rtype: tuple, then cast as str"""
+
+    cls()
+    global secret_word
+    
+    with open(file_path) as file_call:
+        file_read = file_call.read() 
+        if index > len(file_read.split(" ")):
+            index = index%len(file_read.split(" "))
+        #if player chosen number bigger than text length, cycles back to choose a number from text 
+        distinct_list = []
+        for j in file_read.split(" "):
+            if j not in distinct_list:
+                distinct_list.append(j)     
+        #creates a list of distinct words from text, no functionality but was required for excercise                       
+        for num,word in enumerate(file_read.split(" "), 1):
+            if int(num) == index:
+                secret_word = (len(distinct_list), word) 
+                break 
+        #cycles through words in text and, when reached player chosen number, stops and chooses word
+    secret_word = secret_word[1]  
+def intro_print():
+    """This function is used to print out the intro screen
+    :param num_of_tries: increments by 1 for every valid letter guess mistake, global from main function through try_update_letter_guessed function
+    :param HANGMAN_ASCII_ART: static ASCII for intro print
+    :param MAX_TRIES: leftover from 1st excercise"""
+
+    HANGMAN_ASCII_ART = """\n\n\n\n
+\t\t _    _                (imagine old 8 bit music playing...)                          
+\t\t| |  | |                                        
+\t\t| |__| | __ _ _ __   __ _ _ __ ___   __ _ _ __  
+\t\t|  __  |/ _` | '_ \ / _` | '_ ` _ \ / _` | '_ \ 
+\t\t| |  | | (_| | | | | (_| | | | | | | (_| | | | |
+\t\t|_|  |_|\__,_|_| |_|\__, |_| |_| |_|\__,_|_| |_|
+\t\t                     __/ |                      
+\t\t                    |___/
+"""
+    MAX_TRIES = 6
+    for letter in HANGMAN_ASCII_ART:
+        print (letter, end = "")
+        time.sleep(.003)
+    print(MAX_TRIES)
+def cls():
+    """This function is used to clear the screen intermittently, static sleep time"""
+    time.sleep(2)
+    os.system('cls' if os.name == 'nt' else 'clear')
+def main():
+    """This function is the main function for playing the game, cycling through iterations of player inputs
+    :return:  various functions, asking player for guesses, checking validity, checking win\\lose conditions
+    :rtype: functions"""
+    
+    old_letters_guessed = []
+    #starts as empty list and is appended valid, correct and incorrect player guess
+    global num_of_tries
+    num_of_tries = 0  
+    #mistakes counter, start at 0
+    global secret_word    
+    secret_word = '' 
+    #turns to secret word via player choice
+    cls()
+    intro_print() 
+    cls()
+    while True:
+        try:                
+            choose_word(file_path = input("\n\t\tWhat path shall you take?: (insert file path)  "),\
+                             index = int(input("\n\t\tChoose your destiny!: (enter a positive number)  ")))
+        except (IOError, IndexError, ValueError):
+            cls()
+            print("\n\t\tBe reasonable, Please enter valid file path and a positive number\n\n")
+        else:
+            break
+            main()
+    #try-catch for catching file-not-found or non-positive number errors, if fails recurses to choose_word to try again, if succesful continues
+    cls()
+    print(show_hidden_word(secret_word, old_letters_guessed))
+    cls()
+    
+    while num_of_tries < 7: 
+        print_hangman(num_of_tries) 
+        print(show_hidden_word(secret_word, old_letters_guessed))
+        #I'm always print the hangman photo and interim secret word HERE so the player knows what state he's in!
+        letter_guessed = input("\n\t\t\t\t\tShow me what you've got!(enter any letter):  ") 
+        user_input = check_valid_input(letter_guessed, old_letters_guessed)  
+        #checks validity of player input
+        if user_input == True:
+            try_update_letter_guessed(letter_guessed, old_letters_guessed) 
+        #checks correctness of valid player input
+        else:
+            print('\n\n\t\t\t\t\tX' +'\n\n\t\t\t\t\t' + " -> ".join(sorted(old_letters_guessed)))
+        #prints out error if not valid 
+        cls()
+        check =  check_win(secret_word, old_letters_guessed) 
+        #checks win conditions for every turn
+        if check == True:
+            print("\n\n\n\t\t\t\t\tWIN") 
+            time.sleep(2)
+            break
+        #win condition met - prints out photo
+        if num_of_tries == 7:
+            print_hangman(num_of_tries)
+            print("\n\n\n\t\t\t\t\tLOSE") 
+            time.sleep(2)
+        #mistakes counter reached max, game lost, prints out photo
+    #cycle through player inputs until max mistakes available reached
+if __name__ == "__main__":
+    main()
